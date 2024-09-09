@@ -1,0 +1,1 @@
+java -jar swagger-codegen-cli-3.0.61.jar generate -i app/src/main/resources/oas.yaml -l typescript-angular -o app/src/main/resources/typescript/

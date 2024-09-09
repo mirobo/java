@@ -1,0 +1,125 @@
+openapi: 3.0.0
+info:
+  title: test
+  description: test
+  version: 1.0.0
+paths:
+  /oneOf:
+    get:
+      responses:
+        '200':
+          description: dummy
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                 - $ref: '#/components/schemas/Cat'
+                 - $ref: '#/components/schemas/Dog'
+                       
+  /allOf:
+    get:
+      responses:
+        '200':
+          description: dummy
+          content:
+            application/json:
+              schema: 
+                required:
+                  - result
+                properties:
+                  result:
+                    type: object
+                    additionalProperties: true
+                  messages:
+                     $ref: '#/components/schemas/Messages'
+components:
+  schemas:
+    Dog:
+      type: object
+      properties:
+        bark:
+          type: boolean
+        breed:
+          type: string
+          enum: [Dingo, Husky, Retriever, Shepherd]
+    Cat:
+      type: object
+      properties:
+        hunts:
+          type: boolean
+        age:
+          type: integer
+    Messages:
+      properties:
+        error:
+          type: array
+          items:
+            $ref:  '#/components/schemas/MyError'
+        success:
+          type: array
+          items:
+            $ref:  '#/components/schemas/Message'
+        info:
+          type: array
+          items:
+            $ref:  '#/components/schemas/Message'
+        extendedErrorModel:
+          type: object
+          $ref:  '#/components/schemas/ExtendedErrorModel'
+    MyError:
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+        text:
+          type: string
+    Message:
+      allOf:
+        - $ref: '#/components/schemas/MyError'
+        - type: object
+          properties:
+            actions:
+              type: array
+              items: 
+                type: string
+            data:
+              type: array
+              items:
+                type: object
+                # additionalProperties: true
+    Message2:
+      oneOf:
+      - type: object
+        additionalProperties: true
+        properties:
+          actions:
+            type: array
+            items: 
+              type: string
+          data:
+            type: array
+            items:
+              type: object
+    BasicErrorModel:
+      type: object
+      required:
+        - message
+        - code
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+          minimum: 100
+          maximum: 600
+    ExtendedErrorModel:
+      allOf:     # Combines the BasicErrorModel and the inline model
+        - $ref: '#/components/schemas/BasicErrorModel'
+        - type: object
+          required:
+            - rootCause
+          properties:
+            rootCause:
+              type: string
